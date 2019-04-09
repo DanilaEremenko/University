@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
         # [:(n - 1) / 2], because second half it's mirror image of first half
         plot_graphic(
-            x=t[:(n - 1) / 2], y=sig[:(n - 1) / 2],
+            x=t[:int((n - 1) / 2)], y=sig[:int((n - 1) / 2)],
             title=title + 'signal',
             x_label='time(S)', y_label='signal',
             xlim=[0, 1],
@@ -39,7 +39,7 @@ if __name__ == '__main__':
         )
 
         plot_graphic(
-            x=fft_freq[:(n - 1) / 2], y=abs(sig_fft)[:(n - 1) / 2],
+            x=fft_freq[:int((n - 1) / 2)], y=abs(sig_fft)[:int((n - 1) / 2)],
             title=title + 'spectrum',
             x_label='frequency (Hz)', y_label='amplitude (V)',
             xlim=[0, 150],
