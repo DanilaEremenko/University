@@ -33,12 +33,15 @@ if __name__ == '__main__':
         show=True
     )
 
-    # create filter TODO
-    b, a = signal.butter(3, Wn=[0.019, 0.021], btype='bandpass')
+    for N in [ 4, 5, 6]:
+        for btype in ['bandstop']:
 
-    # filter the signal TODO
-    filtered = signal.filtfilt(b, a, sig_noise)
+            # create filter TODO
+            fnum, fdenom = signal.butter(N, Wn=[0.019, 0.021], btype=btype)
 
-    plot_graphic(x=t[:int((n - 1) / 2)], y=filtered[:int((n - 1) / 2)], x_label='Time',
-                 y_label='Amplitude', title='Filtered signal',
-                 show=True, save=False)
+            # filter the signal TODO
+            filtered = signal.filtfilt(fnum, fdenom, sig_noise)
+
+            plot_graphic(x=t[:int((n - 1) / 2)], y=filtered[:int((n - 1) / 2)], x_label='Time',
+                         y_label='Amplitude', title='Filtered signal, N = %.d' % N,
+                         show=True)
