@@ -13,14 +13,7 @@ if __name__ == '__main__':
 
     t = np.arange(0, n * ts, step=ts)  # time vector
 
-    sig = get_sin_sig(t, sig_freq, ampl)
-
-    plot_graphic(
-        x=t[:int((n - 1) / 2)], y=sig[:int((n - 1) / 2)],
-        title='signal',
-        x_label='time(S)', y_label='signal',
-        xlim=[0, 1], ylim=[-4, 3],
-        show=True)
+    sig = ampl * np.sin(2 * np.pi * sig_freq * t)
 
     # noise signal-----------------------------------------------------------------------
     sig_noise = sig + np.random.randn(len(sig))
@@ -45,24 +38,43 @@ if __name__ == '__main__':
         show=True
     )
 
-    # Nyquist freequency
-    nyq = 0.5 * fs
-    Wn = 2 * 2 * sig_freq / nyq
-    N = 4
+    # IIR params
+    nyq = 0.5 * fs  # Nyquist freequency
+    Wn = 2 * sig_freq / nyq
+    N = 6
 
-    for btype in ['lowpass', 'highpass']:
+    # FIR params TODO somebody fix it!
+    fir_freq = [0.0, 0.5, nyq]
+    fir_gain = [1.0, 1.0, 0.0]
+    fir_delta = 1.0
+
+    # calculate & compare filters
+    for filt_func in (signal.butter, signal.firwin2):
         # create filter
-        fnum, fdenom = signal.butter(N=N, Wn=Wn, btype=btype)
+        if filt_func == signal.butter:
+            fnum, fdenom = filt_func(N=N, Wn=Wn)
+            filtered = signal.filtfilt(fnum, fdenom, sig_noise)
+            name = 'IIR butter'
+        elif filt_func == signal.firwin2:
+            filtered = filt_func(n, fs=fs, freq=fir_freq, gain=fir_gain, window=('kaiser', fir_delta))
+            name = 'FIR'
 
-        # filter signal
-        filtered = signal.filtfilt(fnum, fdenom, sig_noise)
+        plot_graphic(
+            x=t[:int((n - 1) / 2)], y=sig[:int((n - 1) / 2)],
+            title='signal',
+            x_label='time(S)', y_label='signal',
+            xlim=[0, 1], ylim=[-4, 3],
+            show=False)
 
         plot_graphic(
             x=t[:int((n - 1) / 2)], y=filtered[:int((n - 1) / 2)],
-            title='filtered signal\nbtype = %s, N = %d' % (btype, N),
+            title='%s\nfilter result, N = %d' % (name, N),
             x_label='time(S)', y_label='signal',
             xlim=[0, 1], ylim=[-4, 3],
-            show=True)
+            show=False)
+
+        plt.legend(('signal', 'filtered signal'), loc='upper right', shadow=False)
+        plt.show()
 
         # calculate spectrum
         fft_freq = np.fft.fftfreq(n, ts)  # discrete Fourier Transform frequencies
@@ -70,7 +82,7 @@ if __name__ == '__main__':
 
         plot_graphic(
             x=fft_freq[:int((n - 1) / 2)], y=abs(sig_fft)[:int((n - 1) / 2)],
-            title='spectrum of filtered signal\nbtype = %s, N = %d' % (btype, N),
+            title='%s\nspectrum of filtered signal, N = %d' % (name, N),
             x_label='frequency (Hz)', y_label='amplitude (V)',
             xlim=[0, 150],
             show=True
