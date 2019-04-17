@@ -1,6 +1,7 @@
 from __future__ import print_function
 from Telecom.my_telecom import *
 from scipy import signal
+import numpy as np
 
 if __name__ == '__main__':
     # Parameters of signals
@@ -15,18 +16,27 @@ if __name__ == '__main__':
 
     sig = ampl * np.sin(2 * np.pi * sig_freq * t)
 
-    # noise signal-----------------------------------------------------------------------
+    # --------------------- noise signal calculating & plotting ------------------------
     sig_noise = sig + np.random.randn(len(sig))
 
     plot_graphic(
         x=t[:int((n - 1) / 2)], y=sig_noise[:int((n - 1) / 2)],
-        title='noise signal ',
         x_label='time(S)', y_label='amplitude (V)',
         xlim=[0, 1], ylim=[-4, 3],
-        show=True
+        show=False
     )
 
-    # noise signal spectrum--------------------------------------------------------------
+    plot_graphic(
+        x=t[:int((n - 1) / 2)], y=sig[:int((n - 1) / 2)],
+        title='signals ',
+        x_label='time(S)', y_label='amplitude (V)',
+        xlim=[0, 1], ylim=[-4, 3],
+        show=False
+    )
+    plt.legend(('noise', 'original'), loc='upper right', shadow=True)
+    plt.show()
+
+    # ---------------------- noise signal spectrum -------------------------------
     fft_freq = np.fft.fftfreq(n, ts)  # discrete Fourier Transform frequencies
     sig_fft = np.fft.fft(sig_noise) / n * 2  # discrete Fourier Transform ( / n * 2 - normalization)
 
@@ -43,32 +53,34 @@ if __name__ == '__main__':
     Wn = 2 * sig_freq / nyq
     N = 6
 
-    # FIR params TODO somebody fix it!
-    fir_freq = [0.0, 0.5, nyq]
-    fir_gain = [1.0, 1.0, 0.0]
-    fir_delta = 1.0
-
     # calculate & compare filters
-    for filt_func in (signal.butter, signal.firwin2):
-        # create filter
-        if filt_func == signal.butter:
+    for filt_func in [signal.butter, signal.firwin]:
+
+        # ---------------- create filter ------------------------
+        if filt_func == signal.butter:  # IIR
+            N = 6
             fnum, fdenom = filt_func(N=N, Wn=Wn)
             filtered = signal.filtfilt(fnum, fdenom, sig_noise)
             name = 'IIR butter'
-        elif filt_func == signal.firwin2:
-            filtered = filt_func(n, fs=fs, freq=fir_freq, gain=fir_gain, window=('kaiser', fir_delta))
-            name = 'FIR'
 
+        elif filt_func == signal.firwin:  # FIR
+            N = int(N * 2.7)
+            low_filter = filt_func(numtaps=N, cutoff=sig_freq, fs=fs)
+            filtered = signal.convolve(sig_noise, low_filter)
+            name = 'FIR window'
+
+        mae = np.abs((sig - filtered[0:n]).mean())
+
+        # --------------- plot source & filtred signal --------------------
         plot_graphic(
             x=t[:int((n - 1) / 2)], y=sig[:int((n - 1) / 2)],
-            title='signal',
             x_label='time(S)', y_label='signal',
             xlim=[0, 1], ylim=[-4, 3],
             show=False)
 
         plot_graphic(
             x=t[:int((n - 1) / 2)], y=filtered[:int((n - 1) / 2)],
-            title='%s\nfilter result, N = %d' % (name, N),
+            title='%s\nfilter result, N = %d\nmae = %f' % (name, N, mae),
             x_label='time(S)', y_label='signal',
             xlim=[0, 1], ylim=[-4, 3],
             show=False)
@@ -76,7 +88,7 @@ if __name__ == '__main__':
         plt.legend(('signal', 'filtered signal'), loc='upper right', shadow=False)
         plt.show()
 
-        # calculate spectrum
+        # ---------------- calculate & plot spectrum ---------------------------
         fft_freq = np.fft.fftfreq(n, ts)  # discrete Fourier Transform frequencies
         sig_fft = np.fft.fft(filtered) / n * 2  # discrete Fourier Transform ( / n * 2 - normalization)
 
