@@ -4,7 +4,7 @@ from scipy import signal
 import numpy as np
 
 if __name__ == '__main__':
-    # Parameters of signals
+    # ----------------------------- Parameters of signals ------------------------------
     sig_freq = 20  # frequency of original signal
     T = 1.0 / sig_freq
     ampl = 2  # amplitude of original signal
