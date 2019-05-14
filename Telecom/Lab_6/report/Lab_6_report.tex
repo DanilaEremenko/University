@@ -1,0 +1,126 @@
+\include{settings}
+
+\begin{document}	% начало документа
+
+% Титульная страница
+\include{titlepage}
+
+% Содержание
+\include{ToC}
+
+
+\section{Цель работы}
+Изучить основные возможности библиотеки gnuradio и разработать тестовый пример, с использованием библиотеки gnuradio.
+
+\section{Программа работы}
+В среде gnuradio реализовать программу, включающую:
+						\\-генератор зашумленного сигнала
+						\\-фильтр низких частот, для фильтрации шума
+						\\-блок, рассчитывающий mae(mean absolute error)
+						\\-графический интерефейс, позволяющий анализировать качество фильтрации, а также, позволяющий изменять параметры фильтра.
+
+
+\section{Ход выполнения работы}
+
+
+\subsection{Листинг (Блок-схема)}
+
+Variable - блок-переменная.
+
+QT GUI Range - блок, создающий переменную и графический интерфейс, позволяющий изменять значение созданной переменной в процессе работы.
+
+Signal Source - блок, генерирующий сигнал с заданными параметрами.
+
+Noise Source - блок, генерирующий шум с заданными параметрами.
+
+Subtract, Add, Abs - блоки, выполняющие арифметические операции.
+
+Throttle - блок, с заданной частотой дискретизации преобразовывающий исходный аналоговый сигнал в дискретный.
+
+Low Pass Filter - блок-фильтр нижних частот.
+
+QT Gui Time Sing - блок, создающий графический интерфейс для отображения сигналов во времени.
+
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.7]{block_schema}
+		\caption{Блок-схема}
+		\label{pic:block_schema} % название для ссылок внутри кода
+	\end{center}
+\end{figure}
+
+\subsection{Исходный зашумленный сигнал}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.7]{noise_init}
+		\caption{Исходный зашумленный сигнал}
+		\label{pic:noise_init} % название для ссылок внутри кода
+	\end{center}
+\end{figure}
+\newpage
+
+% ------------------------------- init block -------------------------------------------
+\subsection{Результаты фильтрации до настройки фильтра}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.5]{graphic_init}
+		\caption{Исходный и отфилтрованный зашумленный сигнал}
+		\label{pic:graphic_init} % название для ссылок внутри кода
+	\end{center}
+\end{figure}
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.5]{mae_init}
+		\caption{Средняя абсолютная ошибка}
+		\label{pic:mae_init} % название для ссылок внутри кода
+	\end{center}
+\end{figure}
+\newpage
+% ------------------------------- edited block 1 -------------------------------------------
+\subsection{Результаты филтрации с хорошо подоборанным параметром transition width}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.5]{good_params}
+		\caption{Значение параметра transation width}
+		\label{pic:good_params} % название для ссылок внутри кода
+	\end{center}
+\end{figure}
+
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.5]{good_graphics}
+		\caption{Исходный сигнал, отфилтрованный зашумленный сигнал и средняя абсолютная ошибка}
+		\label{pic:good_graphics} % название для ссылок внутри кода
+	\end{center}
+\end{figure}
+\newpage
+
+% ------------------------------- edited block 2 -------------------------------------------
+\subsection{Результаты филтрации с плохо подоборанным параметром transition width}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.5]{bad_params}
+		\caption{Значение параметра transation width}
+		\label{pic:bad_params} % название для ссылок внутри кода
+	\end{center}
+\end{figure}
+
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.5]{bad_graphics}
+		\caption{Исходный сигнал, отфилтрованный зашумленный сигнал и средняя абсолютная ошибка}
+		\label{pic:bad_graphics} % название для ссылок внутри кода
+	\end{center}
+\end{figure}
+\newpage
+
+% ------------------------------- init block -------------------------------------------
+
+\section{Выводы}
+
+В данной работе были изучены основные возможности библиотеки gnuradio, была произведенна фильтрация зашумленного сигнала и интерактивная настройка фильтра в графической среде библиотеки gnuradio.
+\end{document}
